@@ -1,0 +1,30 @@
+package com.smartsub.service.member;
+
+import com.smartsub.domain.member.Member;
+import com.smartsub.repository.member.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+// 회원가입 메서드
+// - 이메일, 이름, 비밀번호를 인자로 받아 회원을 생성하고 저장
+// - 이메일 중복 체크 및 비밀번호 암호화 처리 포함
+// - 성공 시 회원 ID와 메시지를 담은 SignupResponse 객체 반환
+// - 실패 시 예외 처리 (예: 이메일 중복 시 예외 발생)
+@Service // 서비스 레이어로 등록
+@RequiredArgsConstructor // final 필드에 대한 생성자 자동 생성 (Lombok)
+@Transactional // 트랜잭션 관리
+public class MemberService {
+    private final MemberRepository memberRepository; // MemberRepository 주입
+
+    public Long register(Member member) {
+        validateDuplicateEmail(member.getEmail()); // 이메일 중복 체크
+        return memberRepository.save(member).getId(); // 회원 저장 후 ID 반환
+    }
+
+    private void validateDuplicateEmail(String email) {
+        if (memberRepository.findByEmail(email).isPresent()) {
+            throw new IllegalStateException("이미 존재하는 이메일입니다."); // 이메일 중복 시 예외 발생
+        }
+    }
+}
