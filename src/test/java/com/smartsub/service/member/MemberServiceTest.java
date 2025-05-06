@@ -12,6 +12,8 @@ import com.smartsub.repository.member.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.smartsub.dto.member.MemberResponse;
+
 
 // MemberServiceTest 클래스는 회원 서비스에 대한 테스트를 수행하는 클래스입니다.
 // 이 클래스는 JUnit 5를 사용하여 테스트를 작성합니다.
@@ -65,5 +67,54 @@ class MemberServiceTest {
         assertThatThrownBy(() -> memberService.register(member))
             .isInstanceOf(IllegalStateException.class) // 예외 발생 확인
             .hasMessage("이미 존재하는 이메일입니다."); // 예외 메시지 확인
+    }
+
+    @Test
+    void 회원_조회_성공() {
+        // given
+        Member member = Member.builder()
+            .id(1L)
+            .email("test@example.com")
+            .name("홍길동")
+            .password("1234")
+            .build();
+
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+
+        // when
+        MemberResponse result = memberService.findById(1L);
+
+        // then
+        assertThat(result.getEmail()).isEqualTo("test@example.com");
+    }
+
+    @Test
+    void 회원_조회_실패_예외() {
+        // given
+        when(memberRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> memberService.findById(999L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("해당 회원이 존재하지 않습니다.");
+    }
+
+    @Test
+    void 회원_정보_수정_성공() {
+        // given
+        Long id = 1L;
+        Member member = Member.builder()
+            .id(id)
+            .email("test@example.com")
+            .name("기존이름")
+            .password("1234")
+            .build();
+
+        when(memberRepository.findById(id)).thenReturn(Optional.of(member));
+
+        // when
+        member.updateName("새이름");
+        // then
+        assertThat(member.getName()).isEqualTo("새이름");
     }
 }
