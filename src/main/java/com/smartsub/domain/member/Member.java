@@ -45,4 +45,12 @@ public class Member {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now(); // 객체가 DB에 저장되기 전에 현재 시간을 생성 시간으로 설정
     }
+
+    public void updateName(String name) {
+        this.name = name; // 이름 업데이트
+    }
+
+    public void updatePassword(String password) {
+        this.password = password; // 비밀번호 업데이트
+    }
 }
