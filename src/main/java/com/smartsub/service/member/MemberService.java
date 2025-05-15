@@ -5,6 +5,7 @@ import com.smartsub.dto.member.MemberResponse;
 import com.smartsub.dto.member.MemberUpdateRequest;
 import com.smartsub.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor // final 필드에 대한 생성자 자동 생성 (Lombok)
 @Transactional // 트랜잭션 관리
 public class MemberService {
+
     private final MemberRepository memberRepository; // MemberRepository 주입
+    private final PasswordEncoder passwordEncoder; // 🔧 [수정] 비밀번호 암호화를 위한 PasswordEncoder 추가
+
 
     public Long register(Member member) { // 회원가입 메서드
         validateDuplicateEmail(member.getEmail()); // 이메일 중복 체크
+
+        String encodedPassword = passwordEncoder.encode(member.getPassword()); // 🔧 [수정] 비밀번호 암호화
+        member.updatePassword(encodedPassword); // 🔧 [수정] 암호화된 비밀번호로 설정
+
         return memberRepository.save(member).getId(); // 회원 저장 후 ID 반환
     }
 
@@ -45,7 +53,8 @@ public class MemberService {
             member.updateName(request.getName()); // 이름 업데이트
         }
         if (request.getPassword() != null) {
-            member.updatePassword(request.getPassword()); // 비밀번호 업데이트
+            member.updatePassword(passwordEncoder.encode(request.getPassword())); // 🔧 [수정] 비밀번호 수정 시에도 암호화
+
         }
     }
 }

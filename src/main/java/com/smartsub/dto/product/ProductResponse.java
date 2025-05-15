@@ -11,13 +11,15 @@ public class ProductResponse {
     private String name; // 상품명
     private String category; // 카테고리
     private String unit; // ex: 1개, 1박스 등
+    private String imageUrl; // 상품 이미지 URL
 
     public static ProductResponse from(Product product) { // Product 객체를 ProductResponse로 변환하는 메서드
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
                 product.getCategory(),
-                product.getUnit()
+                product.getUnit(),
+                product.getImageUrl()
         );
     }
 }

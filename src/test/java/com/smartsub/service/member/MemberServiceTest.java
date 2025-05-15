@@ -13,7 +13,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.smartsub.dto.member.MemberResponse;
-
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 // MemberServiceTest 클래스는 회원 서비스에 대한 테스트를 수행하는 클래스입니다.
 // 이 클래스는 JUnit 5를 사용하여 테스트를 작성합니다.
@@ -22,15 +25,19 @@ import com.smartsub.dto.member.MemberResponse;
 // 각 테스트 메서드는 회원 가입, 로그인, 이메일 중복 체크 등의 기능을 테스트합니다.
 // 테스트 메서드에서는 assertEquals, assertThrows 등의 메서드를 사용하여 예상 결과와 실제 결과를 비교합니다.
 
+@ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
-    // 회원가입 테스트
+    @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     private MemberService memberService;
 
     @BeforeEach
     void setUp() {
-        memberRepository = mock(MemberRepository.class); // 가짜 객체 생성
-        memberService = new MemberService(memberRepository); // MemberService 객체 생성
+        memberService = new MemberService(memberRepository, passwordEncoder);
     }
 
     @Test

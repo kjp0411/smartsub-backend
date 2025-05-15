@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*; // PostMapping, RequestBody 추가
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController // RestController 어노테이션을 사용하여 RESTful API를 제공하는 컨트롤러로 설정
 @RequestMapping("/api/products") // API의 기본 URL 경로를 설정
 @RequiredArgsConstructor // 생성자 주입을 위한 어노테이션
