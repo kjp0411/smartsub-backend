@@ -6,6 +6,7 @@ import com.smartsub.service.purchase.PurchaseHistoryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController // RestController 어노테이션을 사용하여 RESTful API를 제공하는 컨트롤러로 설정
 @RequestMapping("/api/purchases") // API의 기본 URL 경로를 설정
 @RequiredArgsConstructor // 생성자 주입을 위한 어노테이션

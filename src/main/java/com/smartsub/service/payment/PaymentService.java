@@ -57,4 +57,11 @@ public class PaymentService {
             .map(PaymentResponse::from) // 결제 정보를 PaymentResponse로 변환
             .collect(Collectors.toList()); // 리스트로 변환
     }
+
+    // 전체 결제 목록 조회
+    public List<PaymentResponse> findAll() {
+        return paymentRepository.findAll().stream()
+            .map(PaymentResponse::from)
+            .collect(Collectors.toList());
+    }
 }
