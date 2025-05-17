@@ -24,25 +24,38 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // 핵심 기능
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'       // Spring Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-validation'     // Bean Validation (JSR-303)
+    implementation 'org.springframework.boot:spring-boot-starter-web'            // Spring Web (REST API 개발)
+
+    // Lombok (컴파일 시 코드 생성을 위한 도구)
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // 개발 편의 기능
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'              // 핫 리로드 등 개발 편의 기능
+
+    // 데이터베이스
+    runtimeOnly 'com.h2database:h2'                                               // 테스트용 H2 인메모리 DB
+
+    // 테스트
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'       // 테스트 관련 기본 라이브러리
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit Platform 런처
 
     // Spring Security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'       // 인증 및 인가 보안 기능
 
-    // JWT (JJWT)
+    // JWT (JSON Web Token) - 인증 토큰 처리
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
+    // Spring Batch - 배치 처리 기능 추가
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.batch:spring-batch-core:5.1.0'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()
