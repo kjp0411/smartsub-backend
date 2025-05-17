@@ -2,8 +2,8 @@ package com.smartsub.controller.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsub.config.SecurityConfig;
-import com.smartsub.dto.anth.LoginRequest;
-import com.smartsub.dto.anth.LoginResponse;
+import com.smartsub.dto.auth.LoginRequest;
+import com.smartsub.dto.auth.LoginResponse;
 import com.smartsub.service.auth.AuthService;
 import com.smartsub.util.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
