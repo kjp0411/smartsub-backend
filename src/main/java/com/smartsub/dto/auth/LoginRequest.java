@@ -1,4 +1,4 @@
-package com.smartsub.dto.anth;
+package com.smartsub.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
