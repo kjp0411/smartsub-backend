@@ -1,7 +1,7 @@
 package com.smartsub.controller.auth;
 
-import com.smartsub.dto.anth.LoginRequest;
-import com.smartsub.dto.anth.LoginResponse;
+import com.smartsub.dto.auth.LoginRequest;
+import com.smartsub.dto.auth.LoginResponse;
 import com.smartsub.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

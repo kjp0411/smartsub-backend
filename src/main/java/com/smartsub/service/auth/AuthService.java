@@ -19,6 +19,11 @@ public class AuthService {
         Member member = memberRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다.")); // 이메일로 회원 정보 조회
 
+        // ✅ 디버깅 로그 추가
+        System.out.println("입력한 비밀번호: " + rawPassword);
+        System.out.println("DB 저장된 비밀번호: " + member.getPassword());
+        System.out.println("일치 여부: " + passwordEncoder.matches(rawPassword, member.getPassword()));
+
         if (!passwordEncoder.matches(rawPassword, member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다."); // 비밀번호 불일치 예외 처리
         }
