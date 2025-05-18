@@ -1,6 +1,7 @@
 package com.smartsub.domain.payment;
 
 import com.smartsub.domain.member.Member;
+import com.smartsub.domain.product.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,6 +32,10 @@ public class Payment {
     @ManyToOne(optional = false) // optional = false는 이 관계가 필수임을 나타냄
     @JoinColumn(name = "member_id") // member_id라는 외래 키로 매핑
     private Member member; // 결제한 회원
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "product_id") // 외래 키 설정
+    private Product product;
 
     @Column(nullable = false) // null을 허용하지 않음
     private Integer amount; // 결제 금액

@@ -3,10 +3,12 @@ package com.smartsub.service.payment;
 import com.smartsub.domain.member.Member;
 import com.smartsub.domain.payment.Payment;
 import com.smartsub.domain.payment.PaymentStatus;
+import com.smartsub.domain.product.Product;
 import com.smartsub.dto.payment.PaymentRequest;
 import com.smartsub.dto.payment.PaymentResponse;
 import com.smartsub.repository.member.MemberRepository;
 import com.smartsub.repository.payment.PaymentRepository;
+import com.smartsub.repository.product.ProductRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +22,19 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository; // 결제 정보를 저장하는 레포지토리
     private final MemberRepository memberRepository; // 회원 정보를 저장하는 레포지토리
+    private final ProductRepository productRepository; // ✅ 상품 레포지토리 추가
 
     public PaymentResponse createPayment(PaymentRequest request) {
         Member member = memberRepository.findById(request.getMemberId())
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다.")); // 회원 정보 조회
 
+        Product product = productRepository.findById(request.getProductId())
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다.")); // ✅ 상품 조회
+
         // 결제 정보 생성
         Payment payment = Payment.builder()
             .member(member) // 회원 정보 설정
+            .product(product) // ✅ 상품 정보 설정
             .amount(request.getAmount()) // 결제 금액 설정
             .paymentMethod(request.getPaymentMethod()) // 결제 방법 설정
             .status(PaymentStatus.PENDING)
