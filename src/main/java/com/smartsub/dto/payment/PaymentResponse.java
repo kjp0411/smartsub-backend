@@ -12,6 +12,8 @@ public class PaymentResponse {
 
     private Long id; // 결제 ID
     private Long memberId; // 결제한 회원 ID
+    private Long productId;       // ✅ 상품 ID 추가
+    private String productName;   // ✅ 상품 이름 추가
     private Integer amount; // 결제 금액
     private String paymentMethod; // 결제 방법 (예: 카드, 계좌이체 등)
     private PaymentStatus status; // 결제 상태 (예: 성공, 실패 등)
@@ -21,6 +23,8 @@ public class PaymentResponse {
         return new PaymentResponse(
             payment.getId(),
             payment.getMember().getId(),
+            payment.getProduct().getId(),               // ✅ ID
+            payment.getProduct().getName(),             // ✅ 이름
             payment.getAmount(),
             payment.getPaymentMethod(),
             payment.getStatus(),
