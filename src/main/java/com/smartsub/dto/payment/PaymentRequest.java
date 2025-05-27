@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // NoArgsConstructor 어노테이션을 사용하여 기본 생성자 자동 생성
 @AllArgsConstructor // AllArgsConstructor 어노테이션을 사용하여 모든 필드를 매개변수로 받는 생성자 자동 생성
 public class PaymentRequest {
-
-    private Long memberId;        // 결제한 회원 ID
-    private Long productId;       // ✅ 구매한 상품 ID
+    private Long productId;       // 구매한 상품 ID
     private Integer amount;       // 결제 금액
     private String paymentMethod; // 결제 수단 (예: 카드, 계좌이체 등)
 }

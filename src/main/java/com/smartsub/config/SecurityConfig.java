@@ -35,10 +35,14 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/auth/**",
                     "/api/members",
-                    "/h2-console/**"
+                    "/h2-console/**",
+                    "/api/payments",
+                    "/api/payments/**"
                 ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                 .anyRequest().authenticated()
             )
+
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
             .build();
     }

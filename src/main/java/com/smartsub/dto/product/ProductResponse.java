@@ -9,6 +9,7 @@ import lombok.Getter;
 public class ProductResponse {
     private Long id; // 상품 ID
     private String name; // 상품명
+    private int price; // 상품 가격
     private String category; // 카테고리
     private String unit; // ex: 1개, 1박스 등
     private String imageUrl; // 상품 이미지 URL
@@ -17,6 +18,7 @@ public class ProductResponse {
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
+                product.getPrice(),
                 product.getCategory(),
                 product.getUnit(),
                 product.getImageUrl()

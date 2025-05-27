@@ -15,57 +15,53 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service // 서비스 레이어를 나타내는 어노테이션
-@RequiredArgsConstructor // 생성자 주입을 위한 어노테이션
-@Transactional // 트랜잭션을 관리하기 위한 어노테이션
+@Service
+@RequiredArgsConstructor
+@Transactional
 public class PaymentService {
 
-    private final PaymentRepository paymentRepository; // 결제 정보를 저장하는 레포지토리
-    private final MemberRepository memberRepository; // 회원 정보를 저장하는 레포지토리
-    private final ProductRepository productRepository; // ✅ 상품 레포지토리 추가
+    private final PaymentRepository paymentRepository;
+    private final MemberRepository memberRepository;
+    private final ProductRepository productRepository;
 
-    public PaymentResponse createPayment(PaymentRequest request) {
-        Member member = memberRepository.findById(request.getMemberId())
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다.")); // 회원 정보 조회
+    // ✅ memberId를 별도로 받는 버전
+    public PaymentResponse createPayment(PaymentRequest request, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Product product = productRepository.findById(request.getProductId())
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다.")); // ✅ 상품 조회
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
-        // 결제 정보 생성
         Payment payment = Payment.builder()
-            .member(member) // 회원 정보 설정
-            .product(product) // ✅ 상품 정보 설정
-            .amount(request.getAmount()) // 결제 금액 설정
-            .paymentMethod(request.getPaymentMethod()) // 결제 방법 설정
+            .member(member)
+            .product(product)
+            .amount(request.getAmount())
+            .paymentMethod(request.getPaymentMethod())
             .status(PaymentStatus.PENDING)
             .build();
 
-        // 임시 로직: 금액이 0보다 크면 결제 성공, 아니면 실패
         if (request.getAmount() > 0) {
             payment.markSuccess();
         } else {
             payment.markFailed();
         }
 
-        Payment saved = paymentRepository.save(payment); // 결제 정보 저장
-        return PaymentResponse.from(saved); // 저장된 결제 정보를 PaymentResponse로 변환하여 반환
+        Payment saved = paymentRepository.save(payment);
+        return PaymentResponse.from(saved);
     }
 
-    // 결제 정보 단건 조회
     public PaymentResponse findById(Long id) {
         Payment payment = paymentRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("해당 결제 내역이 없습니다.")); // 결제 정보 조회
-        return PaymentResponse.from(payment); // 결제 정보를 PaymentResponse로 변환하여 반
+            .orElseThrow(() -> new IllegalArgumentException("해당 결제 내역이 없습니다."));
+        return PaymentResponse.from(payment);
     }
 
-    // 회원 ID 기준 목록 조회
     public List<PaymentResponse> findByMemberId(Long memberId) {
         return paymentRepository.findByMemberId(memberId).stream()
-            .map(PaymentResponse::from) // 결제 정보를 PaymentResponse로 변환
-            .collect(Collectors.toList()); // 리스트로 변환
+            .map(PaymentResponse::from)
+            .collect(Collectors.toList());
     }
 
-    // 전체 결제 목록 조회
     public List<PaymentResponse> findAll() {
         return paymentRepository.findAll().stream()
             .map(PaymentResponse::from)
