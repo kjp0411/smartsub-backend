@@ -16,41 +16,38 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider; // JWT 토큰을 생성하고 검증하는 클래스
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+        HttpServletResponse response,
+        FilterChain filterChain)
+        throws ServletException, IOException {
 
-        String token = resolveToken(request); // 요청에서 JWT 토큰 추출
+        String token = resolveToken(request);
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            String email = jwtTokenProvider.getEmailFromToken(token); // JWT에서 이메일 추출
+            Long memberId = jwtTokenProvider.getMemberIdFromToken(token); // ✅ memberId로 변경
 
-            // 인증 객체 생성 (우선 권한 없이)
+            // Authentication 객체에 memberId 저장
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, null);
+                new UsernamePasswordAuthenticationToken(memberId, null, null); // ✅ 주체를 memberId로
 
             authentication.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
+                new WebAuthenticationDetailsSource().buildDetails(request)
             );
 
-            // 인증 정보 등록
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
-        filterChain.doFilter(request, response); // 다음 필터로 요청 전달
+        filterChain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization"); // Authorization 헤더에서 토큰 추출
-
+        String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // "Bearer " 부분 제거
+            return bearerToken.substring(7);
         }
-
-        return null; // 토큰이 없거나 형식이 잘못된 경우 null 반환
+        return null;
     }
 }

@@ -11,43 +11,48 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
 
-    private Key secretKey; // 비밀 키
-    private final long expirationMs = 1000 * 60 * 60; // 만료 시간 (1시간)
+    private Key secretKey;
+    private final long expirationMs = 1000 * 60 * 60; // 1시간
 
     @PostConstruct
     protected void init() {
-        // 비밀 키 초기화
-        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256); // HS256 알고리즘에 맞는 비밀 키 생성
-        // 실제 운영에서는 외부에서 비밀 키를 주입받는 것이 좋음
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
-    public String generateToken(String email) {
+    // ✅ memberId를 subject로 설정
+    public String generateToken(Long memberId) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + expirationMs); // 만료 시간 설정
+        Date expiry = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-            .setSubject(email) // JWT의 주체 (사용자 이메일)
-            .setIssuedAt(now) // 발급 시간
-            .setExpiration(expiry) // 만료 시간
-            .signWith(secretKey) // 비밀 키로 서명
-            .compact(); // JWT 생성
+            .setSubject(String.valueOf(memberId)) // 🔄 memberId를 문자열로 저장
+            .setIssuedAt(now)
+            .setExpiration(expiry)
+            .signWith(secretKey)
+            .compact();
     }
 
-    public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
-            .setSigningKey(secretKey) // 비밀 키로 서명 검증
+    // ✅ JWT에서 memberId 꺼내기
+    public Long getMemberIdFromToken(String token) {
+        String subject = Jwts.parserBuilder()
+            .setSigningKey(secretKey)
             .build()
-            .parseClaimsJws(token) // JWT 파싱
+            .parseClaimsJws(token)
             .getBody()
-            .getSubject(); // 주체 (사용자 이메일) 반환
+            .getSubject();
+
+        return Long.parseLong(subject); // 🔄 memberId로 변환
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token); // JWT 파싱 및 서명 검증
-            return true; // 검증 성공
+            Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token);
+            return true;
         } catch (Exception e) {
-            return false; // 검증 실패
+            return false;
         }
     }
 }
