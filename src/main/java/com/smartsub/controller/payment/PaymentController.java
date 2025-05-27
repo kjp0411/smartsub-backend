@@ -6,6 +6,7 @@ import com.smartsub.service.payment.PaymentService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +24,21 @@ public class PaymentController {
     private final PaymentService paymentService; // 결제 정보를 처리하는 서비스
 
     @PostMapping
-    public ResponseEntity<PaymentResponse> createPayment(@RequestBody PaymentRequest request) {
-        PaymentResponse response = paymentService.createPayment(request); // 결제 등록 서비스 호출
-        return ResponseEntity.ok(response); // 등록 성공 시 200 응답 반환
+    public ResponseEntity<PaymentResponse> createPayment(
+        @RequestBody PaymentRequest request,
+        @AuthenticationPrincipal Object principal // principal은 JWT 인증 필터에서 설정한 값
+    ) {
+        Long memberId;
+        if (principal instanceof String) {
+            memberId = Long.parseLong((String) principal); // 예: "25"
+        } else if (principal instanceof Long) {
+            memberId = (Long) principal;
+        } else {
+            throw new IllegalArgumentException("회원 정보 확인 불가");
+        }
+
+        PaymentResponse response = paymentService.createPayment(request, memberId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

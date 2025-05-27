@@ -23,6 +23,9 @@ public class Product {
     private Long id; // 상품 ID
 
     @Column(nullable = false) // null을 허용하지 않음
+    private int price;
+
+    @Column(nullable = false) // null을 허용하지 않음
     private String name; // 상품명
 
     @Column(nullable = false) // null을 허용하지 않음
