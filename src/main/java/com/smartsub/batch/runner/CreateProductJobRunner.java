@@ -7,7 +7,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class CreateProductJobRunner implements CommandLineRunner {
 
     private final JobLauncher jobLauncher;
