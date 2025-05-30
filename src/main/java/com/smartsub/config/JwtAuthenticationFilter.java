@@ -25,19 +25,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         String token = resolveToken(request);
+        System.out.println("🧪 JwtAuthenticationFilter 진입");
+        System.out.println("🪪 받은 토큰: " + token);
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            Long memberId = jwtTokenProvider.getMemberIdFromToken(token); // ✅ memberId로 변경
+            Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
+            System.out.println("✅ 추출된 memberId: " + memberId); // 🔍 여기 확인
 
-            // Authentication 객체에 memberId 저장
             UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(memberId, null, null); // ✅ 주체를 memberId로
+                new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, null);
 
             authentication.setDetails(
                 new WebAuthenticationDetailsSource().buildDetails(request)
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
+            System.out.println("⛔ 유효하지 않은 토큰");
         }
 
         filterChain.doFilter(request, response);
