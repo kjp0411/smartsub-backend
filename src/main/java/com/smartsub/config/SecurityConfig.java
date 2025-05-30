@@ -27,22 +27,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 설정 추가
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .httpBasic().disable()
             .csrf().disable()
             .headers(headers -> headers.frameOptions().disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/auth/**",
-                    "/api/members",
-                    "/h2-console/**",
-                    "/api/payments",
-                    "/api/payments/**"
-                ).permitAll()
+                // ✅ 인증 없이 접근 가능한 경로
+                .requestMatchers("/api/auth/**", "/api/members", "/h2-console/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/reviews/product/**").permitAll() // 🔓 리뷰 조회는 허용
+                // ✅ 리뷰 작성은 인증 필요
+                .requestMatchers(HttpMethod.POST, "/api/reviews/**").authenticated()
                 .anyRequest().authenticated()
             )
-
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
             .build();
     }
@@ -52,14 +49,13 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // 프론트엔드 주소
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); // 로그인 시 필요
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
