@@ -57,4 +57,10 @@ public class MemberService {
 
         }
     }
+
+    public void updateName(Long id, String newName) {
+        Member member = memberRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+        member.updateName(newName);
+    }
 }
