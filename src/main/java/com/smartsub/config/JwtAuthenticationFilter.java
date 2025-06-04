@@ -24,13 +24,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         FilterChain filterChain)
         throws ServletException, IOException {
 
+        // ✅ /batch/** 경로는 필터 적용 제외
+        String path = request.getServletPath();
+        if (path.startsWith("/batch/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = resolveToken(request);
         System.out.println("🧪 JwtAuthenticationFilter 진입");
         System.out.println("🪪 받은 토큰: " + token);
 
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
-            System.out.println("✅ 추출된 memberId: " + memberId); // 🔍 여기 확인
+            System.out.println("✅ 추출된 memberId: " + memberId);
 
             UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, null);
