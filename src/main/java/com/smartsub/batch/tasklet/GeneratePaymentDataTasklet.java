@@ -8,6 +8,7 @@ import com.smartsub.repository.member.MemberRepository;
 import com.smartsub.repository.payment.PaymentRepository;
 import com.smartsub.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class GeneratePaymentDataTasklet implements Tasklet {
@@ -34,21 +36,41 @@ public class GeneratePaymentDataTasklet implements Tasklet {
         List<Member> members = memberRepository.findAll();
         List<Product> products = productRepository.findAll();
 
-        for (int i = 0; i < 50; i++) {
+        log.info("🧾 회원 수: {}", members.size());
+        log.info("📦 상품 수: {}", products.size());
+
+        if (members.isEmpty() || products.isEmpty()) {
+            log.warn("❗ 결제 데이터를 생성할 수 없습니다. 회원 또는 상품 리스트가 비어 있습니다.");
+            return RepeatStatus.FINISHED;
+        }
+
+        int count = 0;
+
+        // 회원 × 상품 조합에 대해 여러 회 결제 생성
+        for (int i = 0; i < 30; i++) {
             Member member = members.get(random.nextInt(members.size()));
             Product product = products.get(random.nextInt(products.size()));
 
-            Payment payment = Payment.builder()
-                .member(member)
-                .product(product)
-                .amount(product.getPrice())
-                .paymentMethod(METHODS[random.nextInt(METHODS.length)])
-                .status(PaymentStatus.SUCCESS)
-                .paidAt(LocalDateTime.now().minusDays(random.nextInt(30)))
-                .build();
+            int repeat = 2 + random.nextInt(2); // 2~3회 결제 생성
 
-            paymentRepository.save(payment);
+            for (int j = 0; j < repeat; j++) {
+                LocalDateTime paidAt = LocalDateTime.now().minusDays(random.nextInt(30));
+
+                Payment payment = Payment.builder()
+                    .member(member)
+                    .product(product)
+                    .amount(product.getPrice())
+                    .paymentMethod(METHODS[random.nextInt(METHODS.length)])
+                    .status(PaymentStatus.SUCCESS)
+                    .paidAt(paidAt)
+                    .build();
+
+                paymentRepository.save(payment);
+                count++;
+            }
         }
+
+        log.info("✅ 총 {}건의 결제 데이터 생성 완료", count);
 
         return RepeatStatus.FINISHED;
     }
