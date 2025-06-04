@@ -25,41 +25,39 @@ repositories {
 
 dependencies {
     // 핵심 기능
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'       // Spring Data JPA
-    implementation 'org.springframework.boot:spring-boot-starter-validation'     // Bean Validation (JSR-303)
-    implementation 'org.springframework.boot:spring-boot-starter-web'            // Spring Web (REST API 개발)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // Lombok (컴파일 시 코드 생성을 위한 도구)
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // 개발 편의 기능
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'              // 핫 리로드 등 개발 편의 기능
+    // 개발 편의
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // 데이터베이스
-    runtimeOnly 'com.h2database:h2'                                               // 테스트용 H2 인메모리 DB
+    runtimeOnly 'com.h2database:h2'
+    implementation 'com.mysql:mysql-connector-j:8.0.33'
 
     // 테스트
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'       // 테스트 관련 기본 라이브러리
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                 // JUnit Platform 런처
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Spring Security
-    implementation 'org.springframework.boot:spring-boot-starter-security'       // 인증 및 인가 보안 기능
-
-    // JWT (JSON Web Token) - 인증 토큰 처리
+    // Spring Security + JWT
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    // Spring Batch - 배치 처리 기능 추가
+    // Spring Batch + CSV
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.batch:spring-batch-core:5.1.0'
-
-    // Spring Batch Admin - 배치 작업 모니터링 및 관리
     implementation 'com.opencsv:opencsv:5.7.1'
 
+    // WebFlux
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
-
 
 tasks.named('test') {
     useJUnitPlatform()
