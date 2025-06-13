@@ -18,6 +18,8 @@ public class BatchTestController {
     private final Job createDummyMemberJob;
     private final Job createProductJob;
     private final Job generatePaymentReviewJob;
+    private final Job generateSubscriptionJob;
+    private final Job processSubscriptionPaymentJob;
 
     @PostMapping("/generate-dummy-members")
     public String runDummyMemberJob() throws Exception {
@@ -45,4 +47,23 @@ public class BatchTestController {
         jobLauncher.run(generatePaymentReviewJob, params);
         return "✅ 결제 + 리뷰 생성 완료";
     }
+
+    @PostMapping("/generate-subscriptions")
+    public String runSubscriptionJob() throws Exception {
+        JobParameters params = new JobParametersBuilder()
+            .addLong("time", System.currentTimeMillis())
+            .toJobParameters();
+        jobLauncher.run(generateSubscriptionJob, params);
+        return "✅ 정기 구독 생성 완료";
+    }
+
+    @PostMapping("/process-subscription-payments")
+    public String runSubscriptionPaymentJob() throws Exception {
+        JobParameters params = new JobParametersBuilder()
+            .addLong("time", System.currentTimeMillis())
+            .toJobParameters();
+        jobLauncher.run(processSubscriptionPaymentJob, params);
+        return "✅ 정기 결제 실행 완료";
+    }
+
 }
