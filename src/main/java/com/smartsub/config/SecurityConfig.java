@@ -35,6 +35,7 @@ public class SecurityConfig {
                 // ✅ 인증 없이 접근 가능한 경로
                 .requestMatchers("/api/auth/**", "/api/members", "/h2-console/**").permitAll()
                 .requestMatchers("/batch/**").permitAll()
+                .requestMatchers("/oauth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reviews/product/**").permitAll() // 🔓 리뷰 조회는 허용
                 // ✅ 리뷰 작성은 인증 필요
