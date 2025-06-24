@@ -1,15 +1,15 @@
 package com.smartsub.util;
 
-import com.smartsub.service.SlackNotificationService;
+import com.smartsub.service.slack.SlackWebhookService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SlackNotifyTestRunner implements CommandLineRunner {
 
-    private final SlackNotificationService slackService;
+    private final SlackWebhookService slackService;
 
-    public SlackNotifyTestRunner(SlackNotificationService slackService) {
+    public SlackNotifyTestRunner(SlackWebhookService slackService) {
         this.slackService = slackService;
     }
 

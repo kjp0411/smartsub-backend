@@ -41,6 +41,9 @@ public class Member {
 
     private LocalDateTime createdAt; // @Column(nullable = false)를 붙이지 않은 이유는, 객체를 생성할 때는 null 상태일 수 있음
 
+    @Column(name = "slack_user_id")
+    private String slackUserId; // Slack 사용자 ID (선택적 필드)
+
     @PrePersist // 엔티티가 DB에 저장되기 전에 호출되는 메서드
     protected void onCreate() {
         this.createdAt = LocalDateTime.now(); // 객체가 DB에 저장되기 전에 현재 시간을 생성 시간으로 설정

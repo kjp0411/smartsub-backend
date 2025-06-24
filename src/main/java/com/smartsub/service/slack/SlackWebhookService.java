@@ -1,4 +1,4 @@
-package com.smartsub.service;
+package com.smartsub.service.slack;
 
 import com.smartsub.domain.subscription.Subscription;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class SlackNotificationService {
+public class SlackWebhookService {
 
     @Value("${slack.webhook.url}")
     private String webhookUrl;

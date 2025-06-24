@@ -3,7 +3,7 @@ package com.smartsub.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartsub.dto.NotifyTarget;
-import com.smartsub.service.SlackNotificationService;
+import com.smartsub.service.slack.SlackWebhookService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +13,10 @@ import java.util.List;
 @Component
 public class SlackNotifyJsonRunner implements CommandLineRunner {
 
-    private final SlackNotificationService slackService;
+    private final SlackWebhookService slackService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public SlackNotifyJsonRunner(SlackNotificationService slackService) {
+    public SlackNotifyJsonRunner(SlackWebhookService slackService) {
         this.slackService = slackService;
     }
 

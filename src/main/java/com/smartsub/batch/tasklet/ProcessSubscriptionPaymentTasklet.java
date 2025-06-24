@@ -5,7 +5,7 @@ import com.smartsub.domain.payment.PaymentStatus;
 import com.smartsub.domain.subscription.Subscription;
 import com.smartsub.repository.payment.PaymentRepository;
 import com.smartsub.repository.subscription.SubscriptionRepository;
-import com.smartsub.service.SlackNotificationService;
+import com.smartsub.service.slack.SlackWebhookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
@@ -25,7 +25,7 @@ public class ProcessSubscriptionPaymentTasklet implements Tasklet {
 
     private final SubscriptionRepository subscriptionRepository;
     private final PaymentRepository paymentRepository;
-    private final SlackNotificationService slackNotificationService; // 추가
+    private final SlackWebhookService slackNotificationService; // 추가
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
