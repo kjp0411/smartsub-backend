@@ -1,5 +1,7 @@
 package com.smartsub.service.slack;
 
+import com.smartsub.domain.slack.SlackUser;
+import com.smartsub.repository.slack.SlackUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -88,4 +90,25 @@ public class SlackDmService {
             .doOnNext(System.out::println)
             .block();
     }
+
+    // SlackDmService 내부에 SlackUserRepository 주입
+    private final SlackUserRepository slackUserRepository;
+
+    public void sendPaymentDmToMember(Long memberId, String message) {
+        SlackUser slackUser = slackUserRepository.findByMemberId(memberId)
+            .orElseThrow(() -> new IllegalStateException("슬랙 사용자 정보 없음"));
+
+        String accessToken = slackUser.getAccessToken();
+        String slackUserId = slackUser.getSlackUserId();
+
+        webClient.post()
+            .uri("https://slack.com/api/chat.postMessage")
+            .header("Authorization", "Bearer " + accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(Map.of("channel", slackUserId, "text", message))
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
+    }
+
 }

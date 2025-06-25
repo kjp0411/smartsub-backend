@@ -6,9 +6,17 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
+import jakarta.servlet.http.HttpServletRequest;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     private Key secretKey;
@@ -41,7 +49,7 @@ public class JwtTokenProvider {
             .getBody()
             .getSubject();
 
-        return Long.parseLong(subject); // 🔄 memberId로 변환
+        return Long.parseLong(subject);
     }
 
     public boolean validateToken(String token) {
@@ -54,5 +62,28 @@ public class JwtTokenProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    // ✅ 현재 요청에서 JWT 추출 후 memberId 반환
+    public Long getMemberIdFromCurrentToken() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
+            HttpServletRequest request = servletRequestAttributes.getRequest();
+            String authHeader = request.getHeader("Authorization");
+
+            if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7); // "Bearer " 제거
+                return getMemberIdFromToken(token);
+            }
+        }
+        throw new RuntimeException("JWT 토큰을 찾을 수 없습니다.");
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        throw new RuntimeException("JWT 토큰을 찾을 수 없습니다.");
     }
 }
