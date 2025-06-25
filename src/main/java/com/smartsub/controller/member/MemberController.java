@@ -14,6 +14,7 @@ import com.smartsub.dto.member.MemberUpdateRequest;
 import com.smartsub.dto.member.SignupRequest;
 import com.smartsub.dto.member.SignupResponse;
 import com.smartsub.service.member.MemberService;
+import com.smartsub.util.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor // final 필드에 대한 생성자 자동 생성 (Lombok)
 public class MemberController {
     private final MemberService memberService; // MemberService 주입
+    private final JwtTokenProvider jwtTokenProvider;
+
 
     @PostMapping
     public ResponseEntity<SignupResponse> registerMember(@Valid @RequestBody SignupRequest request) {
@@ -58,5 +62,13 @@ public class MemberController {
     ) {
         memberService.updateMember(id, request); // 회원 정보 업데이트
         return ResponseEntity.ok("회원 정보 수정 완료"); // 응답 생성
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<MemberResponse> getMyInfo(@RequestHeader("Authorization") String authHeader) {
+        // "Bearer {token}" 형식이므로 토큰만 추출
+        String token = authHeader.replace("Bearer ", "").trim();
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
+        return ResponseEntity.ok(memberService.findById(memberId));
     }
 }

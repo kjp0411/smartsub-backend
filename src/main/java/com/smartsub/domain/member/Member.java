@@ -1,10 +1,13 @@
 package com.smartsub.domain.member;
 
+import com.smartsub.domain.slack.SlackUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -44,6 +47,9 @@ public class Member {
     @Column(name = "slack_user_id")
     private String slackUserId; // Slack 사용자 ID (선택적 필드)
 
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    private SlackUser slackUser;
+
     @PrePersist // 엔티티가 DB에 저장되기 전에 호출되는 메서드
     protected void onCreate() {
         this.createdAt = LocalDateTime.now(); // 객체가 DB에 저장되기 전에 현재 시간을 생성 시간으로 설정
@@ -56,4 +62,13 @@ public class Member {
     public void updatePassword(String password) {
         this.password = password; // 비밀번호 업데이트
     }
+
+    public SlackUser getSlackUser() {
+        return this.slackUser;
+    }
+
+    public void setSlackUser(SlackUser slackUser) {
+        this.slackUser = slackUser;
+    }
+
 }
