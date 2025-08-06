@@ -72,7 +72,7 @@ public class SlackOAuthService {
                 .build();
 
             slackUserRepository.save(slackUser);
-            member.setSlackUser(slackUser);
+            member.setSlackUserId(slackUserId); // ✅ slackUserId만 저장
             memberRepository.save(member); // 이 줄이 실제로 DB 반영하는 핵심
             log.info("✅ Slack 사용자 정보 저장 완료: {}", slackUserId);
 
