@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SlackUserRepository extends JpaRepository<SlackUser, Long> {
     Optional<SlackUser> findByMemberId(Long memberId);
+
+    Optional<SlackUser> findBySlackUserId(String slackUserId);
 }

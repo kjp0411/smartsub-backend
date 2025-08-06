@@ -111,4 +111,23 @@ public class SlackDmService {
             .block();
     }
 
+    public void sendDirectMessage(String slackUserId, String message, String accessToken) {
+        Map<String, String> body = Map.of(
+            "channel", slackUserId,
+            "text", message
+        );
+
+        WebClient.create("https://slack.com/api")
+            .post()
+            .uri("/chat.postMessage")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer " + accessToken)
+            .bodyValue(body)
+            .retrieve()
+            .bodyToMono(String.class)
+            .doOnNext(res -> System.out.println("Slack 전송 응답: " + res))
+            .block();
+    }
+
+
 }

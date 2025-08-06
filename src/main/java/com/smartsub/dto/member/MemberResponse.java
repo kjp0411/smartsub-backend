@@ -15,7 +15,7 @@ public class MemberResponse {
         this.id = member.getId();
         this.email = member.getEmail();
         this.name = member.getName();
-        this.slackLinked = member.getSlackUser() != null; // Slack 연동 여부 확인
+        this.slackLinked = member.getSlackUserId() != null; // Slack 연동 여부 확인
     }
 
     public static MemberResponse from(Member member) {

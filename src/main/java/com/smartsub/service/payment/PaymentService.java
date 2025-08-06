@@ -6,6 +6,8 @@ import com.smartsub.domain.payment.PaymentStatus;
 import com.smartsub.domain.product.Product;
 import com.smartsub.dto.payment.PaymentRequest;
 import com.smartsub.dto.payment.PaymentResponse;
+import com.smartsub.dto.slack.SlackMessage;
+import com.smartsub.kafka.SlackKafkaProducer;
 import com.smartsub.repository.member.MemberRepository;
 import com.smartsub.repository.payment.PaymentRepository;
 import com.smartsub.repository.product.ProductRepository;
@@ -23,6 +25,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
+    private final SlackKafkaProducer slackKafkaProducer;
 
     // ✅ memberId를 별도로 받는 버전
     public PaymentResponse createPayment(PaymentRequest request, Long memberId) {
@@ -42,6 +45,13 @@ public class PaymentService {
 
         if (request.getAmount() > 0) {
             payment.markSuccess();
+
+            // slack Kafka 알림 추가
+            SlackMessage message = new SlackMessage(
+                member.getId().toString(),
+                member.getName() + "님, 결제가 완료되었습니다."
+            );
+            slackKafkaProducer.send(message);
         } else {
             payment.markFailed();
         }

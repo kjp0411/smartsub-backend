@@ -44,11 +44,8 @@ public class Member {
 
     private LocalDateTime createdAt; // @Column(nullable = false)를 붙이지 않은 이유는, 객체를 생성할 때는 null 상태일 수 있음
 
-    @Column(name = "slack_user_id")
-    private String slackUserId; // Slack 사용자 ID (선택적 필드)
-
-    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
-    private SlackUser slackUser;
+    @Column(name = "slack_user_id", length = 255)
+    private String slackUserId; // Slack 사용자 고유 ID (외래 키 X)
 
     @PrePersist // 엔티티가 DB에 저장되기 전에 호출되는 메서드
     protected void onCreate() {
@@ -63,12 +60,8 @@ public class Member {
         this.password = password; // 비밀번호 업데이트
     }
 
-    public SlackUser getSlackUser() {
-        return this.slackUser;
-    }
-
-    public void setSlackUser(SlackUser slackUser) {
-        this.slackUser = slackUser;
+    public void setSlackUserId(String slackUserId) {
+        this.slackUserId = slackUserId;
     }
 
 }

@@ -3,8 +3,11 @@ package com.smartsub.controller.payment;
 import com.smartsub.dto.payment.PaymentRequest;
 import com.smartsub.dto.payment.PaymentResponse;
 import com.smartsub.service.payment.PaymentService;
+import com.smartsub.util.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,23 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController // RestController 어노테이션을 사용하여 RESTful API를 제공하는 컨트롤러로 설정
 @RequestMapping("/api/payments") // API의 기본 URL 경로를 설정
 @RequiredArgsConstructor // 생성자 주입을 위한 어노테이션
+@Slf4j // 로깅을 위한 Slf4j 어노테이션
 public class PaymentController {
 
     private final PaymentService paymentService; // 결제 정보를 처리하는 서비스
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping
     public ResponseEntity<PaymentResponse> createPayment(
         @RequestBody PaymentRequest request,
-        @AuthenticationPrincipal Object principal // principal은 JWT 인증 필터에서 설정한 값
+        HttpServletRequest httpRequest
     ) {
-        Long memberId;
-        if (principal instanceof String) {
-            memberId = Long.parseLong((String) principal); // 예: "25"
-        } else if (principal instanceof Long) {
-            memberId = (Long) principal;
-        } else {
-            throw new IllegalArgumentException("회원 정보 확인 불가");
-        }
+        String token = jwtTokenProvider.resolveToken(httpRequest);
+        Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
+        log.info("✅ 결제 요청 memberId: {}", memberId);
 
         PaymentResponse response = paymentService.createPayment(request, memberId);
         return ResponseEntity.ok(response);
