@@ -1,64 +1,75 @@
 package com.smartsub.config;
 
 import com.smartsub.util.JwtTokenProvider;
+import com.smartsub.repository.member.MemberRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+
+@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberRepository memberRepository;
+
+    private static final AntPathMatcher matcher = new AntPathMatcher();
+    private static final String[] SKIP_PATHS = {
+        "/batch/**", "/h2-console/**", "/actuator/**", "/api/auth/**"
+    };
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain)
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        for (String p : SKIP_PATHS) {
+            if (matcher.match(p, path)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
         throws ServletException, IOException {
 
-        // ✅ /batch/** 경로는 필터 적용 제외
-        String path = request.getServletPath();
-        if (path.startsWith("/batch/")) {
-            filterChain.doFilter(request, response);
+        String header = req.getHeader("Authorization");
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(req, res);
             return;
         }
 
-        String token = resolveToken(request);
-        System.out.println("🧪 JwtAuthenticationFilter 진입");
-        System.out.println("🪪 받은 토큰: " + token);
+        String token = header.substring(7);
+        try {
+            var jws = jwtTokenProvider.parse(token);
+            var claims = jws.getBody();
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
-            System.out.println("✅ 추출된 memberId: " + memberId);
+            Long memberId = jwtTokenProvider.getMemberId(claims);
 
-            UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, null);
+            Integer ver = jwtTokenProvider.getTokenVersion(claims);
+            if (ver != null) {
+                int current = memberRepository.findTokenVersionById(memberId);
+                if (ver != current) throw new RuntimeException("stale token");
+            }
 
-            authentication.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request)
-            );
+            var authorities = jwtTokenProvider.getRoles(claims).stream()
+                .map(r -> new SimpleGrantedAuthority("ROLE_" + r)) // ROLE_USER / ROLE_ADMIN
+                .toList();
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-            System.out.println("⛔ 유효하지 않은 토큰");
+            var auth = new UsernamePasswordAuthenticationToken(memberId, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext(); // 서명/만료/버전 불일치 등
         }
 
-        filterChain.doFilter(request, response);
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+        chain.doFilter(req, res);
     }
 }

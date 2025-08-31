@@ -11,6 +11,7 @@ import com.smartsub.domain.payment.PaymentStatus;
 import com.smartsub.domain.product.Product;
 import com.smartsub.dto.payment.PaymentRequest;
 import com.smartsub.dto.payment.PaymentResponse;
+import com.smartsub.kafka.SlackKafkaProducer;
 import com.smartsub.repository.member.MemberRepository;
 import com.smartsub.repository.payment.PaymentRepository;
 import com.smartsub.repository.product.ProductRepository;
@@ -26,13 +27,15 @@ class PaymentServiceTest {
     private PaymentRepository paymentRepository;
     private MemberRepository memberRepository;
     private ProductRepository productRepository;
+    private SlackKafkaProducer slackKafkaProducer;
 
     @BeforeEach
     void setUp() {
         paymentRepository = mock(PaymentRepository.class);
         memberRepository = mock(MemberRepository.class);
         productRepository = mock(ProductRepository.class);
-        paymentService = new PaymentService(paymentRepository, memberRepository, productRepository);
+        slackKafkaProducer = mock(SlackKafkaProducer.class);
+        paymentService = new PaymentService(paymentRepository, memberRepository, productRepository, slackKafkaProducer);
     }
 
     @Test
