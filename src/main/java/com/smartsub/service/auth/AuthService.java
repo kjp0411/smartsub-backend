@@ -23,7 +23,7 @@ public class AuthService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다."); // 비밀번호 불일치 예외 처리
         }
 
-        return jwtTokenProvider.generateToken(member.getId()); // JWT 토큰 생성
+        return jwtTokenProvider.generateToken(member); // JWT 토큰 생성
 
     }
 }
