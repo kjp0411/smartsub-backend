@@ -5,15 +5,28 @@ Spring Boot 기반의 정기 구독 서비스 백엔드 시스템입니다.
 
 ---
 
-## 주요 기능
-- 회원 가입, 로그인 (JWT 인증)
-- 상품 CRUD (중복 등록 방지 포함)
-- 결제 등록 및 조회
-- 리뷰 작성 및 조회
-- 정기 결제 스케줄링 (Spring Scheduler & Batch)
-- Slack 알림 연동 (Webhook, OAuth 2.0 기반 DM 확장 예정)
-- Redis 기반 선착순 쿠폰 발급 (예정)
-- Kafka 기반 비동기 메시징 (알림 이벤트 처리)
+## 프로젝트 주요 기술 및 구현 사례
+<img width="800" height="785" alt="image" src="https://github.com/user-attachments/assets/33bebf96-470f-42f2-8656-d4e4132b26f2" />
+
+---
+
+## 시스템 구성도
+<img width="800" height="797" alt="image" src="https://github.com/user-attachments/assets/fa2c848f-6e68-429c-a5b0-40b5006fce27" />
+
+---
+
+## 시스템 구성 요소 및 역할
+<img width="800" height="796" alt="image" src="https://github.com/user-attachments/assets/72b9fe1f-22ef-4e62-80e4-36423595eefc" />
+
+---
+
+## 주요 기능 구현
+<img width="800" height="798" alt="image" src="https://github.com/user-attachments/assets/e91efea1-38ae-48ee-9097-fd2278c2532b" />
+
+---
+
+## 문제 해결 및 리팩토링 경험
+<img width="800" height="790" alt="image" src="https://github.com/user-attachments/assets/4d1e0496-d1a7-4f7e-8032-dd8076b53909" />
 
 ---
 
