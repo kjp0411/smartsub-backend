@@ -1,9 +1,22 @@
 # SmartSub Backend
 
-Spring Boot 기반의 정기 구독 서비스 백엔드 시스템입니다.  
+AI 기반의 정기 구독 서비스 백엔드 시스템입니다.  
 회원 관리, 상품 관리, 결제, 리뷰, 정기 결제 스케줄링 및 Slack 알림 기능 등을 제공합니다.
+SmartSub은 사용자의 구독 패턴을 분석하고,  
+정기 결제와 알림을 자동으로 처리하는 AI 기반 구독 서비스입니다.
 
 ---
+
+## System Architecture
+SmartSub의 전체 인프라 및 데이터 흐름 구조입니다.
+AWS 기반 배포, Kafka 메시징, Redis 캐시, Slack 알림, Python 분석 연동 등
+실무형 백엔드 아키텍처를 설계했습니다.
+<p align="center"> 
+  <img src="docs/smartsub-architecture.png" width="850"> 
+</p> 
+<p align="center"> 
+  <em>Spring Boot 기반 백엔드 – AWS, Redis, Kafka, Slack 통합 구조</em> 
+</p>
 
 ## 프로젝트 주요 기술 및 구현 사례
 <img width="800" height="785" alt="image" src="https://github.com/user-attachments/assets/33bebf96-470f-42f2-8656-d4e4132b26f2" />
