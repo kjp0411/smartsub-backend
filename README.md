@@ -23,7 +23,7 @@ AWS 기반 배포, Kafka 메시징, Redis 캐시, Slack 알림, Python 분석 �
 Spring Batch와 Kafka를 통해 주기적으로 결제 데이터를 처리하고,
 Slack API를 통해 결제 결과 및 정기 구독 알림을 실시간 전송합니다.
 <p align="center"> 
-  <img width="940" height="939" alt="image" src="https://github.com/user-attachments/assets/30cc5b79-b515-4f38-bfd1-0632be2b83c4" />
+  <img height="825" alt="image" src="https://github.com/user-attachments/assets/30cc5b79-b515-4f38-bfd1-0632be2b83c4" />
 </p> 
 <p align="center"> 
   <em>Kafka Consumer(Python) → Slack Webhook 실시간 알림</em> 
