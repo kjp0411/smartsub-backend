@@ -12,7 +12,7 @@ SmartSub의 전체 인프라 및 데이터 흐름 구조입니다.
 AWS 기반 배포, Kafka 메시징, Redis 캐시, Slack 알림, Python 분석 연동 등
 실무형 백엔드 아키텍처를 설계했습니다.
 <p align="center"> 
-  <img src="docs/smartsub-architecture.png" width="850"> 
+  <img width="1747" height="825" alt="image" src="https://github.com/user-attachments/assets/9cbd1532-2d6b-4fd1-81cc-c05729b36c1c"/> 
 </p> 
 <p align="center"> 
   <em>Spring Boot 기반 백엔드 – AWS, Redis, Kafka, Slack 통합 구조</em> 
