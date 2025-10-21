@@ -75,14 +75,6 @@ JWT 인증을 통해 결제 요청이 백엔드로 전달됩니다.
   <em>장바구니 페이지 – 수량 변경 및 합계 계산, 결제 페이지 연동</em> 
 </p>
 
-## 프로젝트 주요 기술 및 구현 사례
-<img width="800" height="785" alt="image" src="https://github.com/user-attachments/assets/33bebf96-470f-42f2-8656-d4e4132b26f2" />
-
----
-
-## 시스템 구성도
-<img width="800" height="797" alt="image" src="https://github.com/user-attachments/assets/fa2c848f-6e68-429c-a5b0-40b5006fce27" />
-
 ---
 
 ## 시스템 구성 요소 및 역할
