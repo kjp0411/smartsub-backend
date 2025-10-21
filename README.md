@@ -29,6 +29,18 @@ Slack API를 통해 결제 결과 및 정기 구독 알림을 실시간 전송�
   <em>Kafka Consumer(Python) → Slack Webhook 실시간 알림</em> 
 </p>
 
+---
+
+## Product List (상품 목록)
+React 프론트엔드에서 백엔드 API로부터 상품 데이터를 받아
+사용자에게 정기구독 가능한 상품 목록을 보여줍니다.
+<p align="center">
+  <img width="940" height="783" alt="image" src="https://github.com/user-attachments/assets/11528d57-5637-4150-bf18-d47d5c8ffac1" />
+</p> 
+<p align="center"> 
+  <em>상품 목록 페이지 – Spring Boot API로부터 전달된 상품 데이터 렌더링</em> 
+</p>
+
 ## 프로젝트 주요 기술 및 구현 사례
 <img width="800" height="785" alt="image" src="https://github.com/user-attachments/assets/33bebf96-470f-42f2-8656-d4e4132b26f2" />
 
