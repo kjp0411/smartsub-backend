@@ -91,13 +91,3 @@ JWT 인증을 통해 결제 요청이 백엔드로 전달됩니다.
 <img width="800" height="790" alt="image" src="https://github.com/user-attachments/assets/4d1e0496-d1a7-4f7e-8032-dd8076b53909" />
 
 ---
-
-## 기술 스택
-- **Backend**: Spring Boot, Spring Security, Spring Batch, Spring Scheduler
-- **Database**: MySQL (H2 for local test), Redis
-- **Messaging**: Kafka
-- **Frontend**: React
-- **DevOps**: Docker, AWS 
-- **CI/CD**: GitHub Actions
-
----
