@@ -101,13 +101,3 @@ JWT 인증을 통해 결제 요청이 백엔드로 전달됩니다.
 - **CI/CD**: GitHub Actions (예정)
 
 ---
-
-## 실행 방법
-```bash
-# 1. 레포지토리 클론
-git clone https://github.com/사용자명/smartsub-backend.git
-cd smartsub-backend
-
-# 2. 빌드 및 실행
-./gradlew build
-./gradlew bootRun
