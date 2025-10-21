@@ -96,8 +96,8 @@ JWT 인증을 통해 결제 요청이 백엔드로 전달됩니다.
 - **Backend**: Spring Boot, Spring Security, Spring Batch, Spring Scheduler
 - **Database**: MySQL (H2 for local test), Redis
 - **Messaging**: Kafka
-- **Frontend**: React (별도 레포지토리)
-- **DevOps**: Docker, AWS (배포 예정)
-- **CI/CD**: GitHub Actions (예정)
+- **Frontend**: React
+- **DevOps**: Docker, AWS 
+- **CI/CD**: GitHub Actions
 
 ---
