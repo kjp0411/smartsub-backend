@@ -29,7 +29,7 @@ Slack API를 통해 결제 결과 및 정기 구독 알림을 실시간 전송�
   <em>Slack OAuth 인증 화면 – 개인화 알림 수신 설정</em> 
 </p>
 <p align="center"> 
-  <img height="825" alt="image" src="https://github.com/user-attachments/assets/30cc5b79-b515-4f38-bfd1-0632be2b83c4" />
+  <img width="825" height="825" alt="image" src="https://github.com/user-attachments/assets/30cc5b79-b515-4f38-bfd1-0632be2b83c4" />
 </p> 
 <p align="center"> 
   <em>Kafka Consumer(Python) → Slack Webhook 실시간 알림</em> 
