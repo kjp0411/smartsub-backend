@@ -1,11 +1,13 @@
 package com.smartsub.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -29,6 +31,21 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsSource()))
             .headers(h -> h.frameOptions(frame -> frame.disable())) // H2 콘솔
+            // JWT는 무상태 세션이어야 함
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            // 401/403 발생 시 JSON 응답으로 반환
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((req, res, e) -> {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setContentType("application/json;charset=UTF-8");
+                    res.getWriter().write("{\"message\":\"Unauthorized\"}");
+                })
+                .accessDeniedHandler((req, res, e) -> {
+                    res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    res.setContentType("application/json;charset=UTF-8");
+                    res.getWriter().write("{\"message\":\"Forbidden\"}");
+                })
+            )
             .authorizeHttpRequests(auth -> auth
                 // --- 공개 엔드포인트 ---
                 .requestMatchers("/h2-console/**").permitAll()
@@ -52,7 +69,12 @@ public class SecurityConfig {
 
                 // --- 주문: 로그인 사용자면 가능 ---
                 .requestMatchers(HttpMethod.POST, "/api/orders/**").authenticated()
+                .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
 
+                // --- 즐겨찾기: 모두 허용 ---
+                .requestMatchers(HttpMethod.POST, "/api/favorites").permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/favorites/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/favorites/**").permitAll()
                 // --- 관리자 페이지 ---
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
