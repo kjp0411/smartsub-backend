@@ -14,12 +14,14 @@ import com.smartsub.repository.product.ProductRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Log4j2
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -27,31 +29,52 @@ public class PaymentService {
     private final ProductRepository productRepository;
     private final SlackKafkaProducer slackKafkaProducer;
 
-    // ✅ memberId를 별도로 받는 버전
     public PaymentResponse createPayment(PaymentRequest request, Long memberId) {
+        log.info("💳 PaymentRequest 수신: productId={}, quantity={}, amount={}, method={}",
+            request.getProductId(), request.getQuantity(), request.getAmount(), request.getPaymentMethod());
+
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         Product product = productRepository.findById(request.getProductId())
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
 
+        int quantity = (request.getQuantity() == null ||  request.getQuantity() <= 0)
+            ? 1
+            : request.getQuantity();
+
+        int amount;
+        if (request.getAmount() == null || request.getAmount() <= 0) {
+            // 프론트에서 amount 안 주면, 상품 가격 * 수량으로 계산
+            amount = product.getPrice() * quantity;
+        } else {
+            amount = request.getAmount();
+        }
+
         Payment payment = Payment.builder()
             .member(member)
             .product(product)
-            .amount(request.getAmount())
+            .quantity(quantity)
+            .amount(amount)
             .paymentMethod(request.getPaymentMethod())
             .status(PaymentStatus.PENDING)
             .build();
 
-        if (request.getAmount() > 0) {
+        // 여기서는 간단하게 금액이 0보다 크면 성공으로 처리
+        if (amount > 0) {
             payment.markSuccess();
 
-            // slack Kafka 알림 추가
-            SlackMessage message = new SlackMessage(
-                member.getId().toString(),
-                member.getName() + "님, 결제가 완료되었습니다."
-            );
-            slackKafkaProducer.send(message);
+            try {
+                // slack Kafka 알림 전송
+                SlackMessage message = new SlackMessage(
+                    member.getId().toString(),
+                    member.getName() + "님, 결제가 완료되었습니다."
+                );
+                slackKafkaProducer.send(message);
+            } catch (Exception e) {
+                // ✅ 로컬 개발용: Kafka 장애는 로그만 찍고 결제는 계속 성공 처리
+                log.warn("Slack Kafka 전송 실패 (무시하고 결제는 계속 진행): {}", e.getMessage());
+            }
         } else {
             payment.markFailed();
         }

@@ -1,74 +1,39 @@
 package com.smartsub.controller.member;
 
-// 회원가입 메서드
-// - 클라이언트로부터 회원가입 요청을 받고, 회원 정보를 저장하는 메서드
-// - @PostMapping("/signup") 어노테이션을 사용하여 POST 요청을 처리
-// - @RequestBody 어노테이션을 사용하여 요청 본문을 SignupRequest 객체로 변환
-// - @Valid 어노테이션을 사용하여 요청 데이터 검증
-// - @ResponseStatus(HttpStatus.CREATED) 어노테이션을 사용하여 응답 상태 코드를 201 Created로 설정
-// - @ResponseBody 어노테이션을 사용하여 응답 본문을 SignupResponse 객체로 변환
-
 import com.smartsub.domain.member.Member;
-import com.smartsub.dto.member.MemberResponse;
-import com.smartsub.dto.member.MemberUpdateRequest;
 import com.smartsub.dto.member.SignupRequest;
 import com.smartsub.dto.member.SignupResponse;
 import com.smartsub.service.member.MemberService;
-import com.smartsub.util.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "http://localhost:3000")
-@RestController // RESTful API 컨트롤러로 등록
-@RequestMapping("/api/members") // API 경로 설정
-@RequiredArgsConstructor // final 필드에 대한 생성자 자동 생성 (Lombok)
+@RestController
+@RequestMapping("/api/members")
+@RequiredArgsConstructor
 public class MemberController {
-    private final MemberService memberService; // MemberService 주입
-    private final JwtTokenProvider jwtTokenProvider;
 
+    private final MemberService memberService;
 
+    // 회원가입: POST /api/members
     @PostMapping
     public ResponseEntity<SignupResponse> registerMember(@Valid @RequestBody SignupRequest request) {
         Member member = Member.builder()
                 .email(request.getEmail())
                 .name(request.getName())
-                .password(request.getPassword()) // 비밀번호는 추후 암호화 처리 필요
+                .password(request.getPassword()) // TODO: Service쪽에서 암호화
                 .build();
 
-        Long id = memberService.register(member); // 회원 등록
-        return ResponseEntity.status(201).body(new SignupResponse(id, "회원가입 성공")); // 응답 생성
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<MemberResponse> getMember(@PathVariable Long id) {
-        return ResponseEntity.ok(memberService.findById(id)); // 회원 조회
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<String> updateMember(
-        @PathVariable Long id,
-        @RequestBody MemberUpdateRequest request
-    ) {
-        memberService.updateMember(id, request); // 회원 정보 업데이트
-        return ResponseEntity.ok("회원 정보 수정 완료"); // 응답 생성
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<MemberResponse> getMyInfo(@RequestHeader("Authorization") String authHeader) {
-        // "Bearer {token}" 형식이므로 토큰만 추출
-        String token = authHeader.replace("Bearer ", "").trim();
-        Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
-        return ResponseEntity.ok(memberService.findById(memberId));
+        Long id = memberService.register(member);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(new SignupResponse(id, "회원가입 성공"));
     }
 }
