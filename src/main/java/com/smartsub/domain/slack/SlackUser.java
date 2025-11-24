@@ -15,11 +15,13 @@ public class SlackUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @Column(nullable = false)
     private String slackUserId;
 
+    @Column(nullable = false, length = 400)
     private String accessToken;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", unique = true)
-    private Member member;
 }

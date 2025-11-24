@@ -1,7 +1,6 @@
 package com.smartsub.batch.tasklet;
 
 import com.smartsub.domain.payment.Payment;
-import com.smartsub.domain.payment.PaymentStatus;
 import com.smartsub.domain.subscription.Subscription;
 import com.smartsub.repository.payment.PaymentRepository;
 import com.smartsub.repository.subscription.SubscriptionRepository;
@@ -48,7 +47,6 @@ public class ProcessSubscriptionPaymentTasklet implements Tasklet {
                 .member(subscription.getMember())
                 .product(subscription.getProduct())
                 .amount(subscription.getProduct().getPrice())
-                .status(PaymentStatus.SUCCESS)
                 .paymentMethod("CARD")
                 .paidAt(today.atTime(subscription.getPreferredTime()))
                 .build();

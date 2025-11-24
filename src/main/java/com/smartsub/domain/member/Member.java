@@ -48,9 +48,6 @@ public class Member {
     @Column(nullable = false, updatable = false) // 생성 시간은 null이 아니고, 수정 불가
     private LocalDateTime createdAt; // @Column(nullable = false)를 붙이지 않은 이유는, 객체를 생성할 때는 null 상태일 수 있음
 
-    @Column(name = "slack_user_id", length = 255)
-    private String slackUserId; // Slack 사용자 고유 ID (외래 키 X)
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role; // 회원의 역할 (USER, ADMIN 등)
@@ -73,10 +70,6 @@ public class Member {
 
     public void updatePassword(String password) {
         this.password = password; // 비밀번호 업데이트
-    }
-
-    public void setSlackUserId(String slackUserId) {
-        this.slackUserId = slackUserId;
     }
 
     // 토큰 버전 증가 메서드(관리자 전용)

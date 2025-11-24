@@ -4,13 +4,12 @@ import com.smartsub.domain.member.Member;
 import com.smartsub.domain.product.Product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,18 +45,13 @@ public class Payment {
     @Column(nullable = false, length = 30)
     private String paymentMethod;   // 결제 방법 (예: CARD, KAKAO_PAY, 계좌 이체 등)
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private PaymentStatus status;   // 결제 상태 (예: PENDING, SUCCESS, FAILED)
-
+    @Column(nullable = false)
     private LocalDateTime paidAt;   // 결제 완료 날짜 및 시간
 
-    public void markSuccess() {
-        this.status = PaymentStatus.SUCCESS;    // 결제 성공으로 상태 변경
-        this.paidAt = LocalDateTime.now();      // 결제 날짜를 현재 시간으로 설정
-    }
-
-    public void markFailed() {
-        this.status = PaymentStatus.FAILED;     // 결제 실패로 상태 변경
+    @PrePersist
+    protected void onCreate() {
+        if (this.paidAt  == null) {
+            this.paidAt = LocalDateTime.now();
+        }
     }
 }

@@ -8,12 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SlackMessage {
-    private String slackUserId;
-    private String message;
-    private String accessToken;
-
-    public SlackMessage(String slackUserId, String message) {
-        this.slackUserId = slackUserId;
-        this.message = message;
-    }
+    private Long memberId;  // 15
+    private String text;    // "xxx 님, 결제가 완료되었습니다."
 }

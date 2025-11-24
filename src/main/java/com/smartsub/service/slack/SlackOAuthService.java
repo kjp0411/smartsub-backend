@@ -6,16 +6,14 @@ import com.smartsub.domain.member.Member;
 import com.smartsub.domain.slack.SlackUser;
 import com.smartsub.repository.member.MemberRepository;
 import com.smartsub.repository.slack.SlackUserRepository;
-
-import com.smartsub.util.JwtTokenProvider;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -28,7 +26,6 @@ public class SlackOAuthService {
     private final MemberRepository memberRepository;
     private final WebClient webClient = WebClient.create();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Value("${slack.client-id}")
     private String clientId;
@@ -37,9 +34,30 @@ public class SlackOAuthService {
     private String clientSecret;
 
     @Value("${slack.redirect-uri}")
-    private String redirectUri;
+    private String redirectUri;   // 예: https://xxxx.ngrok-free.app/oauth/slack/callback
 
-    public void processOAuthCallback(String code) {
+    /**
+     * memberId 를 state 로 실어서 Slack OAuth URL 생성
+     */
+    public String buildAuthorizeUrl(Long memberId) {
+        String encodedRedirect = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+        String url =
+            "https://slack.com/oauth/v2/authorize" +
+                "?client_id=" + clientId +
+                "&scope=chat:write,im:write,users:read" +
+                "&user_scope=chat:write,im:write" +
+                "&state=" + memberId +
+                "&redirect_uri=" + encodedRedirect;
+
+        log.info("Slack OAuth authorize url = {}", url);
+        return url;
+    }
+
+    /**
+     * Slack 이 code + state 를 들고 callback 으로 들어왔을 때 처리
+     */
+    @Transactional
+    public void processOAuthCallback(String code, Long memberId) {
         String jsonResponse = webClient.post()
             .uri("https://slack.com/api/oauth.v2.access")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -53,17 +71,18 @@ public class SlackOAuthService {
 
         log.info("Slack OAuth 응답: {}", jsonResponse);
 
+
         try {
             JsonNode root = objectMapper.readTree(jsonResponse);
 
             String slackUserId = root.path("authed_user").path("id").asText();
             String slackAccessToken = root.path("authed_user").path("access_token").asText();
 
-            // ✅ AFTER: JWT에서 memberId 추출
-            String token = jwtTokenProvider.resolveToken(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest()); // 예: Authorization 헤더에서 추출
-            Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
             Member member = memberRepository.findById(memberId).orElseThrow();
 
+            // 같은 회원이 다시 연동하면 이전 레코드 삭제
+            slackUserRepository.findByMemberId(memberId)
+                .ifPresent(slackUserRepository::delete);
 
             SlackUser slackUser = SlackUser.builder()
                 .member(member)
@@ -72,25 +91,13 @@ public class SlackOAuthService {
                 .build();
 
             slackUserRepository.save(slackUser);
-            member.setSlackUserId(slackUserId); // ✅ slackUserId만 저장
-            memberRepository.save(member); // 이 줄이 실제로 DB 반영하는 핵심
-            log.info("✅ Slack 사용자 정보 저장 완료: {}", slackUserId);
-
+            log.info("✅ Slack 사용자 정보 저장 완료: memberId={}, slackUserId={}", memberId, slackUserId);
+            log.info("OAuth raw JSON = {}", jsonResponse);
+            log.info("authed_user.id = {}", root.path("authed_user").path("id").asText());
+            log.info("authed_user.access_token = {}", root.path("authed_user").path("access_token").asText());
         } catch (Exception e) {
-            log.error("Slack 사용자 정보 파싱 실패", e);
+            log.error("Slack OAuth 처리 실패", e);
+            throw new IllegalStateException("Slack OAuth 처리 실패", e);
         }
     }
-    public String resolveToken() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null) return null;
-
-        HttpServletRequest request = attributes.getRequest();
-        String bearerToken = request.getHeader("Authorization");
-
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
 }

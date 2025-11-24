@@ -1,5 +1,6 @@
 package com.smartsub.repository.slack;
 
+import com.smartsub.domain.member.Member;
 import com.smartsub.domain.slack.SlackUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,5 +11,9 @@ import org.springframework.stereotype.Repository;
 public interface SlackUserRepository extends JpaRepository<SlackUser, Long> {
     Optional<SlackUser> findByMemberId(Long memberId);
 
+    Optional<SlackUser> findByMember(Member member);
+
     Optional<SlackUser> findBySlackUserId(String slackUserId);
+
+    boolean existsByMember(com.smartsub.domain.member.Member member);
 }

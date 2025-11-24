@@ -1,13 +1,10 @@
 package com.smartsub.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartsub.domain.slack.SlackUser;
 import com.smartsub.dto.slack.SlackMessage;
-import com.smartsub.repository.slack.SlackUserRepository;
 import com.smartsub.service.slack.SlackDmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -16,29 +13,26 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class SlackKafkaConsumer {
 
-    private final ObjectMapper objectMapper;
     private final SlackDmService slackDmService;
-    private final SlackUserRepository slackUserRepository;  // ✅ 추가
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @KafkaListener(topics = "slack-message-topic", groupId = "slack-consumer")
-    public void consume(ConsumerRecord<String, String> record) {
+    // groupId는 애노테이션에서 지우고, application.properties의 spring.kafka.consumer.group-id를 사용 권장
+    @KafkaListener(topics = "slack-message-topic")
+    public void consume(String payload) {
         try {
-            SlackMessage message = objectMapper.readValue(record.value(), SlackMessage.class);
-            log.info("📥 Kafka 메시지 수신: {}", message);
+            log.info("Kafka 수신 payload: {}", payload);
 
-            // ✅ accessToken은 DB에서 조회
-            SlackUser slackUser = slackUserRepository.findBySlackUserId(message.getSlackUserId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 Slack 유저를 찾을 수 없습니다."));
+            // {"memberId":15,"text":"..."} 형식 가정
+            SlackMessage msg = objectMapper.readValue(payload, SlackMessage.class);
 
-            slackDmService.sendDirectMessage(
-                message.getSlackUserId(),
-                message.getMessage(),
-                slackUser.getAccessToken()
+            // SlackMessage가 slackUserId가 아니라 memberId를 들고 오는 형태라면,
+            // DM 보낼 때 memberId로 SlackUser를 조회해서 전송하도록 SlackDmService를 사용
+            slackDmService.sendByMemberId(
+                msg.getMemberId(),    // Long memberId
+                msg.getText()         // String text
             );
-
         } catch (Exception e) {
-            log.error("Kafka 메시지 처리 실패", e);
+            log.error("Kafka 수신 처리 실패: {}", payload, e);
         }
     }
 }
-

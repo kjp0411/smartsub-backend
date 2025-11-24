@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.smartsub'
@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url "https://repo.spring.io/release" }
 }
 
 dependencies {
@@ -52,7 +53,6 @@ dependencies {
 
     // Spring Batch + CSV
     implementation 'org.springframework.boot:spring-boot-starter-batch'
-    implementation 'org.springframework.batch:spring-batch-core:5.1.0'
     implementation 'com.opencsv:opencsv:5.7.1'
 
     // WebFlux

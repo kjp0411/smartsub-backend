@@ -2,7 +2,6 @@ package com.smartsub.batch.tasklet;
 
 import com.smartsub.domain.member.Member;
 import com.smartsub.domain.payment.Payment;
-import com.smartsub.domain.payment.PaymentStatus;
 import com.smartsub.domain.product.Product;
 import com.smartsub.repository.member.MemberRepository;
 import com.smartsub.repository.payment.PaymentRepository;
@@ -61,7 +60,6 @@ public class GeneratePaymentDataTasklet implements Tasklet {
                     .product(product)
                     .amount(product.getPrice())
                     .paymentMethod(METHODS[random.nextInt(METHODS.length)])
-                    .status(PaymentStatus.SUCCESS)
                     .paidAt(paidAt)
                     .build();
 
