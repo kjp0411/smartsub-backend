@@ -22,7 +22,6 @@ public class SlackKafkaProducer {
         try {
             String json = objectMapper.writeValueAsString(message);
             kafkaTemplate.send(TOPIC, json);
-            log.info("✅ Kafka 메시지 발행 완료: {}", json);
         } catch (JsonProcessingException e) {
             log.error("Kafka 메시지 직렬화 실패", e);
         }

@@ -35,7 +35,6 @@ public class PaymentController {
     ) {
         String token = jwtTokenProvider.resolveToken(httpRequest);
         Long memberId = jwtTokenProvider.getMemberIdFromToken(token);
-        log.info("결제 요청 memberId: {}", memberId);
 
         PaymentResponse response = paymentService.createPayment(request, memberId);
         return ResponseEntity.ok(response);

@@ -20,9 +20,6 @@ public class SlackKafkaConsumer {
     @KafkaListener(topics = "slack-message-topic")
     public void consume(String payload) {
         try {
-            log.info("Kafka 수신 payload: {}", payload);
-
-            // {"memberId":15,"text":"..."} 형식 가정
             SlackMessage msg = objectMapper.readValue(payload, SlackMessage.class);
 
             // SlackMessage가 slackUserId가 아니라 memberId를 들고 오는 형태라면,

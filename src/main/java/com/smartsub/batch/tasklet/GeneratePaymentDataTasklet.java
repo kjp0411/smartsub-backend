@@ -35,9 +35,6 @@ public class GeneratePaymentDataTasklet implements Tasklet {
         List<Member> members = memberRepository.findAll();
         List<Product> products = productRepository.findAll();
 
-        log.info("🧾 회원 수: {}", members.size());
-        log.info("📦 상품 수: {}", products.size());
-
         if (members.isEmpty() || products.isEmpty()) {
             log.warn("❗ 결제 데이터를 생성할 수 없습니다. 회원 또는 상품 리스트가 비어 있습니다.");
             return RepeatStatus.FINISHED;
@@ -67,8 +64,6 @@ public class GeneratePaymentDataTasklet implements Tasklet {
                 count++;
             }
         }
-
-        log.info("✅ 총 {}건의 결제 데이터 생성 완료", count);
 
         return RepeatStatus.FINISHED;
     }

@@ -38,8 +38,6 @@ public class SlackDmService {
                 .bodyToMono(String.class)
                 .block();
 
-            log.info("Slack DM 응답: {}", resp);
-
         } catch (Exception e) {
             log.error("❌ Slack DM 전송 실패 (userId=" + slackUserId + ")", e);
         }

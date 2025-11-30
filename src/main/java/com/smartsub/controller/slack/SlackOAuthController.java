@@ -24,7 +24,6 @@ public class SlackOAuthController {
     public void authorize(@RequestParam("memberId") Long memberId,
         HttpServletResponse response) throws IOException {
         String url = slackOAuthService.buildAuthorizeUrl(memberId);
-        log.info("[SlackOAuth] authorize redirect -> {}", url);
         response.sendRedirect(url);
     }
 
@@ -33,8 +32,6 @@ public class SlackOAuthController {
         @RequestParam("code") String code,
         @RequestParam(value = "state", required = false) String state // state가 없을 수도 있게
     ) {
-        log.info("Slack callback called. code={}, state='{}'", code, state);
-
         if (state == null || state.isBlank()) {
             return ResponseEntity.badRequest().body("state(회원ID)가 비어 있습니다.");
         }

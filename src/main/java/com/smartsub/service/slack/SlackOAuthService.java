@@ -48,8 +48,6 @@ public class SlackOAuthService {
                 "&user_scope=chat:write,im:write" +
                 "&state=" + memberId +
                 "&redirect_uri=" + encodedRedirect;
-
-        log.info("Slack OAuth authorize url = {}", url);
         return url;
     }
 
@@ -68,9 +66,6 @@ public class SlackOAuthService {
             .retrieve()
             .bodyToMono(String.class)
             .block();
-
-        log.info("Slack OAuth 응답: {}", jsonResponse);
-
 
         try {
             JsonNode root = objectMapper.readTree(jsonResponse);
@@ -91,10 +86,6 @@ public class SlackOAuthService {
                 .build();
 
             slackUserRepository.save(slackUser);
-            log.info("✅ Slack 사용자 정보 저장 완료: memberId={}, slackUserId={}", memberId, slackUserId);
-            log.info("OAuth raw JSON = {}", jsonResponse);
-            log.info("authed_user.id = {}", root.path("authed_user").path("id").asText());
-            log.info("authed_user.access_token = {}", root.path("authed_user").path("access_token").asText());
         } catch (Exception e) {
             log.error("Slack OAuth 처리 실패", e);
             throw new IllegalStateException("Slack OAuth 처리 실패", e);

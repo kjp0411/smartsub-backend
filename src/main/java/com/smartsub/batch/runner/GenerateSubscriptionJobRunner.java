@@ -19,7 +19,7 @@ public class GenerateSubscriptionJobRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("🚀 정기 구독 더미 생성 배치 실행 시작");
+        log.info("정기 구독 더미 생성 배치 실행 시작");
 
         JobParameters jobParameters = new JobParametersBuilder()
             .addLong("time", System.currentTimeMillis()) // 매번 고유 파라미터
@@ -27,6 +27,6 @@ public class GenerateSubscriptionJobRunner implements CommandLineRunner {
 
         jobLauncher.run(generateSubscriptionJob, jobParameters);
 
-        log.info("✅ 정기 구독 더미 생성 배치 실행 완료");
+        log.info("정기 구독 더미 생성 배치 실행 완료");
     }
 }
