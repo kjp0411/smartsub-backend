@@ -22,24 +22,26 @@ public class CreateProductsFromCsvTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        Path path = new ClassPathResource("product_test.csv").getFile().toPath();
+        Path path = new ClassPathResource("product_350.csv").getFile().toPath();
 
         try (CSVReader reader = new CSVReader(new FileReader(path.toFile()))) {
             String[] fields;
             reader.readNext(); // 첫 줄 (헤더) 건너뛰기
 
             while ((fields = reader.readNext()) != null) {
-                if (fields.length < 10) continue; // 최소 필드 개수 체크
+                if (fields.length < 7) continue; // 최소 필드 개수 체크
 
                 String rawPrice = fields[1].replaceAll("[^\\d]", "").trim();
                 int price = rawPrice.isEmpty() ? 0 : Integer.parseInt(rawPrice);
 
                 Product product = Product.builder()
-                    .name(fields[0].trim())
-                    .price(price)
-                    .category(fields[9].trim())
-                    .imageUrl(fields[4].trim())
-                    .productCode(fields[6].trim())
+                    .name(fields[0].trim())             // 상품명
+                    .price(price)                       // 가격
+                    .imageUrl(fields[2].trim())         // 이미지 URL
+                    .productCode(fields[3].trim())      // 상품ID
+                    .category1(fields[4].trim())        // 카테고리1
+                    .category2(fields[5].trim())        // 카테고리2
+                    .category3(fields[6].trim())        // 카테고리3
                     .build();
 
                 productRepository.save(product);

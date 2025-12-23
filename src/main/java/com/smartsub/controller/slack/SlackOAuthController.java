@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/oauth/slack")
+@RequestMapping("/api/oauth/slack")
 @Slf4j
 public class SlackOAuthController {
 

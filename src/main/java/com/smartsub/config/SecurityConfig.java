@@ -68,13 +68,14 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
 
                 // --- 주문: 로그인 사용자면 가능 ---
-                .requestMatchers(HttpMethod.POST, "/api/orders/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/payments/**").authenticated()
                 .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN")
 
-                // --- 즐겨찾기: 모두 허용 ---
-                .requestMatchers(HttpMethod.POST, "/api/favorites").permitAll()
-                .requestMatchers(HttpMethod.DELETE, "/api/favorites/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/favorites/**").permitAll()
+                // --- 즐겨찾기: 로그인 사용자면 가능 ---
+                .requestMatchers(HttpMethod.POST, "/api/favorites").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/favorites/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/favorites/**").authenticated()
+
                 // --- 관리자 페이지 ---
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 

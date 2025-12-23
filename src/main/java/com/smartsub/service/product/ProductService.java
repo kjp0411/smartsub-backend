@@ -40,8 +40,9 @@ public class ProductService {
             .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다."));
         product.update(
             request.getName(),
-            request.getCategory(),
-            request.getUnit(),
+            request.getCategory1(),
+            request.getCategory2(),
+            request.getCategory3(),
             request.getImageUrl()
         );
     }

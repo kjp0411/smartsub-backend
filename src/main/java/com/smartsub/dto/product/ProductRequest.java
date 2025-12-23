@@ -8,18 +8,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductRequest {
 
-    private String name; // 상품명
-    private String category; // 카테고리
+    private String name;        // 상품명
     private String productCode; // 상품코드
-    private String unit; // ex: 1개, 1박스 등
-    private String imageUrl; // 상품 이미지 URL
+    private String category1;   // 카테고리
+    private String category2;   // 카테고리
+    private String category3;   // 카테고리
+    private String imageUrl;    // 상품 이미지 URL
 
     public Product toEntity() { // ProductRequest를 Product 엔티티로 변환하는 메서드
         return Product.builder()
                 .name(name)
-                .category(category)
                 .productCode(productCode)
-                .unit(unit)
+                .category1(category1)
+                .category2(category2)
+                .category3(category3)
                 .imageUrl(imageUrl)
                 .build();
     }
