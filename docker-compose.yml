@@ -26,6 +26,10 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+      # EC2 메모리 부족 방지 설정
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx256m"
+
     healthcheck:
       test: ["CMD", "bash", "-c", "kafka-topics --bootstrap-server localhost:9092 --list"]
       interval: 10s
