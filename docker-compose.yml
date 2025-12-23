@@ -9,6 +9,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:7.5.0
@@ -21,11 +22,22 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
+      # 컨테이너 내부 통신 기준 (Spring ↔ Kafka)
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://smartsub-kafka:9092
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    restart: unless-stopped
 
+  backend:
+    build: .
+    container_name: smartsub-backend
+    depends_on:
+      - kafka
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
     restart: unless-stopped
