@@ -7,8 +7,6 @@ import com.smartsub.domain.slack.SlackUser;
 import com.smartsub.repository.member.MemberRepository;
 import com.smartsub.repository.slack.SlackUserRepository;
 import jakarta.transaction.Transactional;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +22,8 @@ public class SlackOAuthService {
 
     private final SlackUserRepository slackUserRepository;
     private final MemberRepository memberRepository;
+
+    // WebClient, ObjectMapper 그대로 사용
     private final WebClient webClient = WebClient.create();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -34,26 +34,17 @@ public class SlackOAuthService {
     private String clientSecret;
 
     @Value("${slack.redirect-uri}")
-    private String redirectUri;   // 예: https://xxxx.ngrok-free.app/oauth/slack/callback
+    private String redirectUri;   // https://smartsub.dev/api/oauth/slack/callback
 
-    /**
-     * memberId 를 state 로 실어서 Slack OAuth URL 생성
-     */
     public String buildAuthorizeUrl(Long memberId) {
-        String encodedRedirect = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
-        String url =
-            "https://slack.com/oauth/v2/authorize" +
-                "?client_id=" + clientId +
-                "&scope=chat:write,im:write,users:read" +
-                "&user_scope=chat:write,im:write" +
-                "&state=" + memberId +
-                "&redirect_uri=" + encodedRedirect;
-        return url;
+        return "https://slack.com/oauth/v2/authorize"
+            + "?client_id=" + clientId
+            + "&scope=users:read"
+            + "&user_scope=chat:write"
+            + "&state=" + memberId
+            + "&redirect_uri=" + redirectUri;
     }
 
-    /**
-     * Slack 이 code + state 를 들고 callback 으로 들어왔을 때 처리
-     */
     @Transactional
     public void processOAuthCallback(String code, Long memberId) {
         String jsonResponse = webClient.post()
@@ -62,20 +53,29 @@ public class SlackOAuthService {
             .body(BodyInserters.fromFormData("code", code)
                 .with("client_id", clientId)
                 .with("client_secret", clientSecret)
-                .with("redirect_uri", redirectUri))
+                .with("redirect_uri", redirectUri)) // ★ authorize와 동일한 redirect_uri 사용
             .retrieve()
             .bodyToMono(String.class)
             .block();
 
         try {
             JsonNode root = objectMapper.readTree(jsonResponse);
+            if (!root.path("ok").asBoolean()) {
+                String error = root.path("error").asText();
+                log.error("Slack OAuth 실패 응답: {}", error);
+                throw new IllegalStateException("Slack OAuth 실패: " + error);
+            }
 
             String slackUserId = root.path("authed_user").path("id").asText();
             String slackAccessToken = root.path("authed_user").path("access_token").asText();
 
-            Member member = memberRepository.findById(memberId).orElseThrow();
+            if (slackUserId.isBlank() || slackAccessToken.isBlank()) {
+                throw new IllegalStateException("Slack OAuth 응답 값이 비어 있습니다.");
+            }
 
-            // 같은 회원이 다시 연동하면 이전 레코드 삭제
+            Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
             slackUserRepository.findByMemberId(memberId)
                 .ifPresent(slackUserRepository::delete);
 
@@ -86,8 +86,12 @@ public class SlackOAuthService {
                 .build();
 
             slackUserRepository.save(slackUser);
+
+            log.info("Slack OAuth 연동 완료 - memberId={}, slackUserId={}",
+                memberId, slackUserId);
+
         } catch (Exception e) {
-            log.error("Slack OAuth 처리 실패", e);
+            log.error("Slack OAuth 처리 중 예외 발생", e);
             throw new IllegalStateException("Slack OAuth 처리 실패", e);
         }
     }
