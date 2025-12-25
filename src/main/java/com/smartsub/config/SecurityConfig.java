@@ -49,7 +49,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // --- 공개 엔드포인트 ---
                 .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/oauth/**").permitAll()
+                .requestMatchers("/api/oauth/slack/**").permitAll()
                 .requestMatchers("/batch/**").permitAll() // 필요 시 API Key/IP 보호 권장
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
