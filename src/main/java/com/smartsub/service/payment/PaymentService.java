@@ -64,15 +64,23 @@ public class PaymentService {
         // 결제 저장
         Payment saved = paymentRepository.save(payment);
 
-        // Slack 알림 / Kafka 비동기 전송
+        // Slack 알림 (동기 처리)
         try {
-            SlackMessage message = new SlackMessage(
-                memberId,
-                member.getName() + "님, 결제가 완료되었습니다."
-            );
-            slackKafkaProducer.send(message);
+            String message =
+                member.getName() + "님, 결제가 완료되었습니다.\n\n"
+                    + "상품명: " + product.getName() + "\n"
+                    + "수량: " + quantity + "개\n"
+                    + "결제 금액: " + amount + "원";
+
+            slackDmService.sendByMemberId(memberId, message);
+
+            // Kafka 비동기 전송은 다음 단계에서 다시 활성화
+            // SlackMessage kafkaMessage = new SlackMessage(memberId, message);
+            // slackKafkaProducer.send(kafkaMessage);
+
         } catch (Exception e) {
-            log.warn("Slack Kafka 전송 실패 (무시하고 결제는 계속 진행): {}", e.getMessage());
+            // 결제는 성공해야 하므로 알림 실패는 로그만
+            log.warn("Slack DM 전송 실패 (결제는 정상 처리됨): {}", e.getMessage());
         }
 
         return PaymentResponse.from(saved);
